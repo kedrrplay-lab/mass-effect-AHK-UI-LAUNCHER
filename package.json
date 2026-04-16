@@ -1,0 +1,44 @@
+{
+  "name": "me-launcher",
+  "version": "0.2.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^41.0.0",
+    "electron-builder": "^26.0.0"
+  },
+  "build": {
+    "appId": "com.k3nz0iq.melauncher",
+    "productName": "Mass Effect Launcher",
+
+    "asar": true,
+    "compression": "maximum",
+    "npmRebuild": false,
+
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer.js",
+      "ui/**/*"
+    ],
+
+    "extraResources": [
+      {
+        "from": "launcher.exe",
+        "to": "../launcher.exe"
+      },
+      {
+        "from": "MassEffectLauncher.ini",
+        "to": "../MassEffectLauncher.ini"
+      }
+    ],
+
+    "win": {
+      "target": "portable",
+      "icon": "ui/icon.ico"
+    }
+  }
+}
