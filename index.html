@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+
+<style>
+@font-face {
+  font-family: "MEFont";
+  src: url("./me123.ttf") format("truetype");
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  overflow: hidden;
+  font-family: "MEFont", Arial;
+  background: black;
+}
+
+/* ФОН */
+.bg {
+  position: absolute;
+  width: 110%;
+  height: 110%;
+  background: url("./background.jpg") center/cover no-repeat;
+  filter: brightness(0.6) contrast(1.2) saturate(1.2) blur(2px);
+  transform: translate(-5%, -5%);
+  transition: transform 0.1s;
+}
+
+/* ОВЕРЛЕЙ */
+.overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255,0,0,0.15), transparent 70%);
+}
+
+/* ЛОГО */
+.logo {
+  position: absolute;
+  top: 40px;
+  width: 100%;
+  text-align: center;
+}
+
+.logo img {
+  width: 420px;
+  filter: brightness(0) invert(1);
+}
+
+/* ПАНЕЛИ */
+.panel {
+  width: 420px;
+  margin: 0 auto;
+  padding: 25px;
+  border-radius: 20px;
+  backdrop-filter: blur(14px);
+  background: rgba(20,20,20,0.55);
+  border: 1px solid rgba(255,60,60,0.25);
+  box-shadow: 0 0 25px rgba(255,0,0,0.15);
+}
+
+/* КОНТЕЙНЕР */
+.container {
+  position: absolute;
+  top: 180px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
+
+/* КНОПКИ */
+.btn {
+  width: 100%;
+  padding: 16px;
+  margin: 10px 0;
+  text-align: center;
+  border: 2px solid rgba(255,60,60,0.6);
+  border-radius: 16px;
+  color: #ff4040;
+  cursor: pointer;
+  background: rgba(0,0,0,0.4);
+  transition: 0.25s;
+  box-sizing: border-box;
+
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+
+  text-shadow: 0 0 6px rgba(255,0,0,0.5);
+}
+
+/* ХОВЕР */
+.btn:hover {
+  background: rgba(255,0,0,0.15);
+  box-shadow: 0 0 15px rgba(255,0,0,0.6);
+  transform: scale(1.03);
+  text-shadow: 0 0 12px rgba(255,0,0,1);
+}
+
+/* НАЖАТИЕ */
+.btn:active {
+  transform: scale(0.97);
+}
+
+/* PLAYGROUND */
+.playground {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,60,60,0.5);
+  background: rgba(0,0,0,0.4);
+  color: #ff5050;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 12px;
+}
+
+.playground:hover {
+  background: rgba(255,0,0,0.2);
+  box-shadow: 0 0 10px red;
+}
+
+/* ПОДПИСЬ */
+.footer {
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+  color: #aaa;
+  font-size: 12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="bg" id="bg"></div>
+<div class="overlay"></div>
+
+<div class="logo">
+  <img src="./logo.png">
+</div>
+
+<div class="container">
+
+  <div class="panel">
+    <div class="btn" onclick="launch('ME1')">Mass Effect 1</div>
+    <div class="btn" onclick="launch('ME2')">Mass Effect 2</div>
+    <div class="btn" onclick="launch('ME3')">Mass Effect 3</div>
+  </div>
+
+  <div class="panel">
+    <div class="btn" id="langBtn" onclick="toggleLang()">RUSSIAN</div>
+    <div class="btn" id="voBtn" onclick="toggleVO()">ENGLISH VO</div>
+  </div>
+
+</div>
+
+<div class="playground" onclick="openPlayground()">PLAYGROUND</div>
+
+<div class="footer">dev: k3nz0iq | ver 0.2 beta</div>
+
+<script>
+// ПАРАЛЛАКС
+document.addEventListener("mousemove", (e) => {
+  let x = (e.clientX / window.innerWidth - 0.5) * 20;
+  let y = (e.clientY / window.innerHeight - 0.5) * 20;
+  document.getElementById("bg").style.transform =
+    `translate(${x}px, ${y}px) scale(1.1)`;
+});
+
+// ---------- СОСТОЯНИЕ ----------
+let currentLang = "Russian";
+let currentVO = false;
+
+// ---------- UI ----------
+function updateUI() {
+  const langBtn = document.getElementById("langBtn");
+  const voBtn = document.getElementById("voBtn");
+
+  if (langBtn) {
+    langBtn.innerText = currentLang === "Russian" ? "RUSSIAN" : "ENGLISH";
+  }
+
+  if (voBtn) {
+    voBtn.innerText = currentVO ? "ENGLISH VO: ON" : "ENGLISH VO: OFF";
+  }
+}
+
+// ---------- INIT ----------
+async function init() {
+  try {
+    const settings = await window.electronAPI.getSettings();
+
+    if (settings) {
+      currentLang = settings.lang || "Russian";
+      currentVO = settings.vo || false;
+    }
+  } catch (e) {
+    console.log("INI read error:", e);
+  }
+
+  updateUI();
+}
+
+// ---------- ЗАПУСК ----------
+function launch(game) {
+  window.electronAPI.launchGame(game, currentLang, currentVO ? 1 : 0);
+}
+
+// ---------- ЯЗЫК ----------
+function toggleLang() {
+  currentLang = currentLang === "Russian" ? "English" : "Russian";
+  updateUI();
+}
+
+// ---------- VO ----------
+function toggleVO() {
+  currentVO = !currentVO;
+  updateUI();
+}
+
+function openPlayground() {
+  window.open("https://users.playground.ru/2492109/");
+}
+
+// ---------- СТАРТ ----------
+window.onload = init;
+</script>
