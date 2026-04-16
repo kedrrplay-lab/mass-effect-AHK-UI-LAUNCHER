@@ -1,13 +1,13 @@
-🚀 Mass Effect: Legendary Edition — Custom Launcher (Версия 2.0)
-✨ Что нового?
+ Mass Effect: Legendary Edition — Custom Launcher (Версия 2.0)
+ Что нового?
 
     Смена языка (возможны небольшие косяки, но работает)
 
     Улучшенная производительность лаунчера
 
-    Автосоздание конфиг-файла (не уверен, что работает… вроде бы да 😅)
+    Автосоздание конфиг-файла (не уверен, что работает… вроде бы да )
 
-📦 Установка
+ Установка
 
     Папку Game скопируйте в корневую папку игры:
     Mass Effect Legendary Edition
@@ -15,7 +15,7 @@
     Запустите файл:
     Launcher Custom.exe
 
-⚠️ Важное примечание по переключению языка
+ Важное примечание по переключению языка
 
     Если у вас не переключается язык на русский:
 
@@ -25,12 +25,12 @@
 
         Запускайте игру 🎮
 
-🔮 Планы на будущее
+ Планы на будущее
 
     В скором времени лаунчер больше не будет зависеть от AHK — он будет переписан на Node.js.
 
-🧩 English version
-🚀 Mass Effect: Legendary Edition — Custom Launcher (Version 2)
+ English version
+ Mass Effect: Legendary Edition — Custom Launcher (Version 2)
 What's new?
 
     Language switching (minor issues possible, but works)
@@ -47,7 +47,7 @@ Installation
     Run the file:
     Launcher Custom.exe
 
-⚠️ Language switching note
+ Language switching note
 
     If your language cannot switch to Russian:
 
@@ -57,7 +57,7 @@ Installation
 
         Run the game 🎮
 
-🔮 Coming soon
+ Coming soon
 
     The launcher will be rewritten in Node.js and will no longer depend on AHK.
 
