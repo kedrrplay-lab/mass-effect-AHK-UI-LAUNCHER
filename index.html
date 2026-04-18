@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html>
 <head>
 <meta charset="UTF-8">
@@ -9,226 +10,334 @@
   src: url("./me123.ttf") format("truetype");
 }
 
+:root {
+  --main-color: #ff3c3c;
+  --glow: rgba(255,60,60,0.6);
+}
+
+body.theme-me1 { --main-color:#cfcfcf; --glow:rgba(200,200,200,0.6);}
+body.theme-me2 { --main-color:#ffcc00; --glow:rgba(255,200,0,0.7);}
+body.theme-me3 { --main-color:#00e5ff; --glow:rgba(0,200,255,0.7);}
+
 body {
-  margin: 0;
-  height: 100vh;
-  overflow: hidden;
-  font-family: "MEFont", Arial;
-  background: black;
+  margin:0;
+  font-family:"MEFont";
+  background:black;
+  overflow:hidden;
+  color:white;
 }
 
-/* ФОН */
 .bg {
-  position: absolute;
-  width: 110%;
-  height: 110%;
-  background: url("./background.jpg") center/cover no-repeat;
-  filter: brightness(0.6) contrast(1.2) saturate(1.2) blur(2px);
-  transform: translate(-5%, -5%);
-  transition: transform 0.1s;
+  position:absolute;
+  width:120%;
+  height:120%;
+  background-size:cover;
+  background-position:center;
+  filter:brightness(0.6) blur(4px);
+  transform:translate(-10%,-10%);
+  transition:0.8s;
 }
 
-/* ОВЕРЛЕЙ */
+.bg.zoom {
+  transform:translate(-10%,-10%) scale(1.2);
+  filter:brightness(0.3) blur(8px);
+}
+
 .overlay {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle, rgba(255,0,0,0.15), transparent 70%);
+  position:absolute;
+  width:100%;
+  height:100%;
+  background:
+    radial-gradient(circle, var(--glow), transparent 60%),
+    linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.8));
 }
 
-/* ЛОГО */
-.logo {
-  position: absolute;
-  top: 40px;
-  width: 100%;
-  text-align: center;
+.wrapper {
+  position:relative;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:space-between;
+  opacity:0;
+  transform:translateY(40px);
+  animation:fadeIn 1.2s ease forwards;
 }
 
-.logo img {
-  width: 420px;
-  filter: brightness(0) invert(1);
+@keyframes fadeIn {
+  to { opacity:1; transform:translateY(0); }
 }
 
-/* ПАНЕЛИ */
-.panel {
-  width: 420px;
-  margin: 0 auto;
-  padding: 25px;
-  border-radius: 20px;
-  backdrop-filter: blur(14px);
-  background: rgba(20,20,20,0.55);
-  border: 1px solid rgba(255,60,60,0.25);
-  box-shadow: 0 0 25px rgba(255,0,0,0.15);
+.header {
+  margin-top:60px;
+}
+.header img {
+  width:360px;
+  filter:brightness(0) invert(1);
 }
 
-/* КОНТЕЙНЕР */
-.container {
-  position: absolute;
-  top: 180px;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 30px;
+.games {
+  display:flex;
+  gap:30px;
 }
 
-/* КНОПКИ */
+.card {
+  width:200px;
+  height:260px;
+  border-radius:18px;
+  overflow:hidden;
+  position:relative;
+
+  border:1px solid var(--main-color);
+  cursor:pointer;
+  transition:0.35s;
+
+  background:rgba(0,0,0,0.4);
+}
+
+.card::before {
+  content:"";
+  position:absolute;
+  width:100%;
+  height:100%;
+  background-size:cover;
+  background-position:center;
+  opacity:0.9;
+  transition:0.4s;
+}
+
+.card:hover {
+  transform:scale(1.07);
+  box-shadow:0 0 25px var(--glow);
+}
+
+.card:hover::before {
+  transform:scale(1.05);
+}
+
+.card.active {
+  box-shadow:0 0 40px var(--glow);
+}
+
+.card.me1::before { background-image:url("./me1.jpg"); }
+.card.me2::before { background-image:url("./me2.jpg"); }
+.card.me3::before { background-image:url("./me3.jpg"); }
+
+.card span {
+  position:absolute;
+  bottom:10px;
+  width:100%;
+  text-align:center;
+  font-size:18px;
+  text-shadow:0 0 10px black;
+}
+
+.playBtn {
+  margin-top:20px;
+  padding:10px 40px;
+  border:2px solid var(--main-color);
+  border-radius:10px;
+
+  background:rgba(0,0,0,0.5);
+  color:var(--main-color);
+
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.playBtn:hover {
+  background:var(--main-color);
+  color:black;
+  box-shadow:0 0 20px var(--glow);
+}
+
+.settings {
+  display:flex;
+  gap:20px;
+  margin-bottom:30px;
+}
+
 .btn {
-  width: 100%;
-  padding: 16px;
-  margin: 10px 0;
-  text-align: center;
-  border: 2px solid rgba(255,60,60,0.6);
-  border-radius: 16px;
-  color: #ff4040;
-  cursor: pointer;
-  background: rgba(0,0,0,0.4);
-  transition: 0.25s;
-  box-sizing: border-box;
+  padding:8px 16px;
+  border:1px solid var(--main-color);
+  border-radius:8px;
 
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
+  background:rgba(0,0,0,0.45);
+  color:var(--main-color);
 
-  text-shadow: 0 0 6px rgba(255,0,0,0.5);
+  cursor:pointer;
 }
 
-/* ХОВЕР */
 .btn:hover {
-  background: rgba(255,0,0,0.15);
-  box-shadow: 0 0 15px rgba(255,0,0,0.6);
-  transform: scale(1.03);
-  text-shadow: 0 0 12px rgba(255,0,0,1);
+  background:var(--main-color);
+  color:black;
+  box-shadow:0 0 12px var(--glow);
 }
 
-/* НАЖАТИЕ */
-.btn:active {
-  transform: scale(0.97);
-}
-
-/* PLAYGROUND */
 .playground {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  padding: 10px 16px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,60,60,0.5);
-  background: rgba(0,0,0,0.4);
-  color: #ff5050;
-  cursor: pointer;
-  transition: 0.2s;
-  font-size: 12px;
+  position:absolute;
+  bottom:15px;
+  left:15px;
+
+  width:36px;
+  height:36px;
+
+  border:1px solid var(--main-color);
+  border-radius:8px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:10px;
+  color:var(--main-color);
+
+  background:rgba(0,0,0,0.4);
+  cursor:pointer;
+  transition:0.25s;
 }
 
 .playground:hover {
-  background: rgba(255,0,0,0.2);
-  box-shadow: 0 0 10px red;
+  background:var(--main-color);
+  color:black;
+  box-shadow:0 0 10px var(--glow);
 }
 
-/* ПОДПИСЬ */
-.footer {
-  position: absolute;
-  bottom: 10px;
-  width: 100%;
-  text-align: center;
-  color: #aaa;
-  font-size: 12px;
+.loading {
+  position:absolute;
+  width:100%;
+  height:100%;
+  background:black;
+  opacity:0;
+  transition:0.6s;
 }
+.loading.active { opacity:1; }
+
 </style>
+
 </head>
 
-<body>
+<body class="theme-me1">
 
 <div class="bg" id="bg"></div>
 <div class="overlay"></div>
 
-<div class="logo">
-  <img src="./logo.png">
-</div>
+<div class="wrapper">
 
-<div class="container">
-
-  <div class="panel">
-    <div class="btn" onclick="launch('ME1')">Mass Effect 1</div>
-    <div class="btn" onclick="launch('ME2')">Mass Effect 2</div>
-    <div class="btn" onclick="launch('ME3')">Mass Effect 3</div>
+  <div class="header">
+    <img src="./logo.png">
   </div>
 
-  <div class="panel">
+  <div>
+    <div class="games">
+      <div class="card me1 active" onclick="selectGame(this,'ME1')">
+        <span>ME1</span>
+      </div>
+
+  <div class="card me2" onclick="selectGame(this,'ME2')">
+    <span>ME2</span>
+  </div>
+
+  <div class="card me3" onclick="selectGame(this,'ME3')">
+    <span>ME3</span>
+  </div>
+</div>
+
+<div style="text-align:center;">
+  <div class="playBtn" onclick="launch()">PLAY</div>
+</div>
+
+  </div>
+
+  <div class="settings">
     <div class="btn" id="langBtn" onclick="toggleLang()">RUSSIAN</div>
-    <div class="btn" id="voBtn" onclick="toggleVO()">ENGLISH VO</div>
+    <div class="btn" id="voBtn" onclick="toggleVO()">VO OFF</div>
   </div>
 
 </div>
 
-<div class="playground" onclick="openPlayground()">PLAYGROUND</div>
+<div class="playground" onclick="openPlayground()">PG</div>
 
-<div class="footer">dev: k3nz0iq | ver 0.2 beta</div>
+<div class="loading" id="loading"></div>
 
 <script>
-// ПАРАЛЛАКС
-document.addEventListener("mousemove", (e) => {
-  let x = (e.clientX / window.innerWidth - 0.5) * 20;
-  let y = (e.clientY / window.innerHeight - 0.5) * 20;
-  document.getElementById("bg").style.transform =
-    `translate(${x}px, ${y}px) scale(1.1)`;
-});
+let backgrounds = {
+  ME1:"./bg1.jpg",
+  ME2:"./bg2.jpg",
+  ME3:"./bg3.jpg"
+};
 
-// ---------- СОСТОЯНИЕ ----------
-let currentLang = "Russian";
-let currentVO = false;
+let langs=["English","French","German","Spanish","Italian","Russian","Polish","Japanese"];
 
-// ---------- UI ----------
-function updateUI() {
-  const langBtn = document.getElementById("langBtn");
-  const voBtn = document.getElementById("voBtn");
+let selectedGame="ME1";
+let langIndex=5;
+let currentVO=false;
 
-  if (langBtn) {
-    langBtn.innerText = currentLang === "Russian" ? "RUSSIAN" : "ENGLISH";
-  }
+const bg=document.getElementById("bg");
 
-  if (voBtn) {
-    voBtn.innerText = currentVO ? "ENGLISH VO: ON" : "ENGLISH VO: OFF";
-  }
-}
+async function init(){
+  const s=await window.electronAPI.getSettings();
+  langIndex=langs.indexOf(s.lang);
+  if(langIndex==-1) langIndex=5;
+  currentVO=s.vo;
 
-// ---------- INIT ----------
-async function init() {
-  try {
-    const settings = await window.electronAPI.getSettings();
-
-    if (settings) {
-      currentLang = settings.lang || "Russian";
-      currentVO = settings.vo || false;
-    }
-  } catch (e) {
-    console.log("INI read error:", e);
-  }
-
+  setTheme("ME1");
+  setBackground("ME1");
   updateUI();
 }
 
-// ---------- ЗАПУСК ----------
-function launch(game) {
-  window.electronAPI.launchGame(game, currentLang, currentVO ? 1 : 0);
+function setBackground(g){
+  bg.style.backgroundImage=`url(${backgrounds[g]})`;
 }
 
-// ---------- ЯЗЫК ----------
-function toggleLang() {
-  currentLang = currentLang === "Russian" ? "English" : "Russian";
+function setTheme(g){
+  document.body.className="";
+  document.body.classList.add("theme-"+g.toLowerCase());
+}
+
+function selectGame(el,g){
+  document.querySelectorAll(".card").forEach(c=>c.classList.remove("active"));
+  el.classList.add("active");
+
+  selectedGame=g;
+  setTheme(g);
+  setBackground(g);
+}
+
+function launch(){
+  document.getElementById("loading").classList.add("active");
+  bg.classList.add("zoom");
+
+  setTimeout(()=>{
+    window.electronAPI.launchGame(
+      selectedGame,
+      langs[langIndex],
+      currentVO?1:0
+    );
+  },1200);
+}
+
+function toggleLang(){
+  langIndex=(langIndex+1)%langs.length;
   updateUI();
 }
 
-// ---------- VO ----------
-function toggleVO() {
-  currentVO = !currentVO;
+function toggleVO(){
+  currentVO=!currentVO;
   updateUI();
 }
 
-function openPlayground() {
+function updateUI(){
+  document.getElementById("langBtn").innerText=langs[langIndex];
+  document.getElementById("voBtn").innerText=currentVO?"VO ON":"VO OFF";
+}
+
+function openPlayground(){
   window.open("https://users.playground.ru/2492109/");
 }
 
-// ---------- СТАРТ ----------
-window.onload = init;
+window.onload=init;
 </script>
+
+</body>
+</html>
