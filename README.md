@@ -1,3 +1,10 @@
+СТАРОЕ ОПИСАНИЕ(МНЕ ЛЕНЬ МЕНЯТЬ)
+OLD DISCRIPTION IM LAZY TO UPDATE HIM
+ 
+ 
+ 
+ 
+ 
  Mass Effect: Legendary Edition — Custom Launcher (Версия 2.0)
  Что нового?
 
