@@ -1,43 +1,42 @@
 {
   "name": "me-launcher",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "build": "electron-builder"
   },
-  "devDependencies": {
-    "electron": "^41.2.1",
-    "electron-builder": "^26.0.0"
-  },
   "build": {
-    "appId": "com.k3nz0iq.melauncher",
-    "productName": "Mass Effect Launcher",
+    "appId": "com.me.launcher",
+    "productName": "MELE Launcher",
+
     "asar": true,
     "compression": "maximum",
-    "npmRebuild": false,
+
+    "directories": {
+      "output": "dist"
+    },
+
     "files": [
       "main.js",
       "preload.js",
-      "renderer.js",
-      "ui/**/*"
+      "ui/**/*",
+      "icon.png"
     ],
-    "extraResources": [
-      {
-        "from": "launcher.exe",
-        "to": "../launcher.exe"
-      },
-      {
-        "from": "MassEffectLauncher.ini",
-        "to": "../MassEffectLauncher.ini"
-      }
-    ],
+
     "win": {
-      "target": "portable",
-      "icon": "ui/icon.ico"
+      "target": "nsis",
+      "icon": "icon.ico"
+    },
+
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true
     }
   },
-  "dependencies": {
-    "ini": "^6.0.0"
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.0.0"
   }
 }

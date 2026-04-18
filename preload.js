@@ -1,8 +1,8 @@
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer } = require('electron')
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  launchGame: (game, lang, vo) =>
-    ipcRenderer.send('launch-game', game, lang, vo),
+  launchGame: (g,l,v)=>ipcRenderer.send('launch-game',g,l,v),
+  getSettings: ()=>ipcRenderer.invoke('get-settings'),
+  saveSettings: (l,v)=>ipcRenderer.send('save-settings',l,v)
+})
 
-  getSettings: () => ipcRenderer.invoke('get-settings')
-});
