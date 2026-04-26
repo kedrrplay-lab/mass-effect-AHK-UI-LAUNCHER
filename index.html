@@ -1,342 +1,1068 @@
 <!DOCTYPE html>
-
-<html>
+<html lang="ru">
 <head>
-<meta charset="UTF-8">
+  <meta charset="UTF-8">
+  <title>Mass Effect Launcher</title>
+  <style>
+    @font-face {
+  font-family: 'MassEffect';
+  src: url('me123.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-<style>
-@font-face {
-  font-family: "MEFont";
-  src: url("./me123.ttf") format("truetype");
+    body {
+      width: 1280px;
+      height: 720px;
+      overflow: hidden;
+      font-family: 'MassEffect', 'Segoe UI', Arial, sans-serif;
+      background: #000;
+      color: #fff;
+      user-select: none;
+    }
+
+    .bg-layer {
+      position: absolute;
+      top: -30px;
+      left: -30px;
+      width: calc(100% + 60px);
+      height: calc(100% + 60px);
+      z-index: 0;
+      transition: transform 0.15s ease-out;
+      will-change: transform;
+    }
+
+    .bg-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.3) saturate(0.6) contrast(1.1);
+    }
+
+    .bg-gradient {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.1) 25%, rgba(0,0,0,0.2) 65%, rgba(0,0,0,0.95) 100%),
+        linear-gradient(90deg, rgba(0,12,30,0.85) 0%, transparent 35%, transparent 65%, rgba(0,8,20,0.7) 100%);
+    }
+
+    .particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,160,255,0.3), transparent 70%);
+      animation: float linear infinite;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0) translateX(0) scale(1);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-720px) translateX(50px) scale(0.5);
+        opacity: 0;
+      }
+    }
+
+    .scanline {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,160,255,0.015) 2px,
+        rgba(0,160,255,0.015) 4px
+      );
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .titlebar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px;
+      z-index: 200;
+      background: linear-gradient(180deg, rgba(0,0,0,0.7), transparent);
+      -webkit-app-region: drag;
+    }
+
+    .titlebar-title {
+      font-size: 11px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: rgba(0,160,255,0.5);
+      padding-left: 12px;
+    }
+
+    .titlebar-buttons {
+      display: flex;
+      gap: 2px;
+      -webkit-app-region: no-drag;
+    }
+
+    .tb-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,0.4);
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tb-btn:hover {
+      color: #fff;
+      background: rgba(255,255,255,0.08);
+    }
+
+    .tb-btn.close:hover {
+      background: rgba(255,50,50,0.6);
+      color: #fff;
+    }
+
+    .main-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 52px 50px 0 50px;
+      position: relative;
+      animation: fadeIn 0.6s ease 0.05s both;
+      z-index: 500;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo-icon {
+      width: 42px;
+      height: 42px;
+    }
+
+    .logo-icon svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo-text .main {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .logo-text .sub {
+      font-size: 9px;
+      letter-spacing: 8px;
+      text-transform: uppercase;
+      color: rgba(0,160,255,0.6);
+      margin-top: 2px;
+    }
+
+    .settings-area {
+      display: flex;
+      gap: 12px;
+    }
+
+    .setting-btn {
+      position: relative;
+      background: rgba(0,160,255,0.06);
+      border: 1px solid rgba(0,160,255,0.15);
+      color: rgba(0,180,255,0.8);
+      padding: 8px 20px;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: inherit;
+      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+      -webkit-app-region: no-drag;
+    }
+
+    .setting-btn:hover {
+      background: rgba(0,160,255,0.15);
+      border-color: rgba(0,160,255,0.4);
+      color: #00c8ff;
+      box-shadow: 0 0 20px rgba(0,160,255,0.15);
+    }
+
+    .setting-btn .label {
+      font-size: 8px;
+      color: rgba(255,255,255,0.3);
+      display: block;
+      margin-bottom: 2px;
+      letter-spacing: 2px;
+    }
+
+    .content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 50px;
+    }
+
+    .game-cards {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+    }
+
+    .game-card {
+      position: relative;
+      width: 300px;
+      height: 400px;
+      cursor: pointer;
+      transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+      overflow: hidden;
+      -webkit-app-region: no-drag;
+    }
+
+    .game-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 1px solid rgba(0,160,255,0.1);
+      clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+      transition: all 0.4s;
+      z-index: 2;
+    }
+
+    .game-card:hover::before {
+      border-color: rgba(0,160,255,0.5);
+      box-shadow: inset 0 0 40px rgba(0,160,255,0.05);
+    }
+
+    .game-card:hover {
+      transform: translateY(-8px) scale(1.02);
+    }
+
+    .card-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+      overflow: hidden;
+      background: #060d18;
+    }
+
+    .card-bg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      filter: brightness(0.45) saturate(0.6) contrast(1.1);
+      transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+      transform: scale(1.01);
+    }
+
+    .game-card:hover .card-bg img {
+      filter: brightness(0.65) saturate(0.85) contrast(1.05);
+      transform: scale(1.08);
+    }
+
+    .card-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background:
+        linear-gradient(180deg, rgba(0,6,16,0.3) 0%, rgba(0,6,16,0.05) 30%, rgba(0,6,16,0.4) 60%, rgba(0,8,20,0.97) 100%),
+        linear-gradient(0deg, rgba(0,100,200,0.03) 0%, transparent 30%);
+      clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+      z-index: 1;
+      transition: all 0.5s;
+    }
+
+    .game-card:hover .card-overlay {
+      background:
+        linear-gradient(180deg, rgba(0,6,16,0.15) 0%, rgba(0,6,16,0) 30%, rgba(0,6,16,0.3) 60%, rgba(0,8,20,0.95) 100%),
+        linear-gradient(0deg, rgba(0,120,255,0.05) 0%, transparent 40%);
+    }
+
+    .card-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 30px 24px;
+      z-index: 3;
+    }
+
+    .card-number {
+      font-size: 56px;
+      font-weight: 700;
+      color: rgba(0,160,255,0.12);
+      line-height: 1;
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      z-index: 3;
+      transition: all 0.4s;
+    }
+
+    .game-card:hover .card-number {
+      color: rgba(0,160,255,0.25);
+    }
+
+    .card-title {
+      font-size: 13px;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 4px;
+    }
+
+    .card-name {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: #fff;
+      margin-bottom: 13px;
+      transition: all 0.3s;
+    }
+
+    .game-card:hover .card-name {
+      color: #00c8ff;
+    }
+
+    .card-playtime {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .playtime-icon {
+      width: 14px;
+      height: 14px;
+      opacity: 0.4;
+    }
+
+    .playtime-text {
+      font-size: 11px;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 2px;
+    }
+
+    .launch-btn {
+      width: 100%;
+      padding: 12px 0;
+      background: rgba(0,160,255,0.08);
+      border: 1px solid rgba(0,160,255,0.2);
+      color: rgba(0,180,255,0.7);
+      font-size: 11px;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: inherit;
+      clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+      position: relative;
+      overflow: hidden;
+      -webkit-app-region: no-drag;
+    }
+
+    .launch-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,160,255,0.1), transparent);
+      transition: left 0.5s;
+    }
+
+    .launch-btn:hover::before {
+      left: 100%;
+    }
+
+    .launch-btn:hover {
+      background: rgba(0,160,255,0.2);
+      border-color: rgba(0,160,255,0.6);
+      color: #00e0ff;
+      box-shadow: 0 0 30px rgba(0,160,255,0.2), inset 0 0 30px rgba(0,160,255,0.05);
+    }
+
+    .launch-btn:active {
+      transform: scale(0.98);
+      background: rgba(0,160,255,0.3);
+    }
+
+    .card-glow-line {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(0,160,255,0.5), transparent);
+      z-index: 4;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .game-card:hover .card-glow-line {
+      opacity: 1;
+      animation: glowPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes glowPulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+    .game-card:nth-child(2):hover::before {
+  border-color: rgba(255,160,0,0.5);
 }
 
-:root {
-  --main-color: #ff3c3c;
-  --glow: rgba(255,60,60,0.6);
+.game-card:nth-child(2):hover .card-name {
+  color: #ffa000;
 }
 
-body.theme-me1 { --main-color:#cfcfcf; --glow:rgba(200,200,200,0.6);}
-body.theme-me2 { --main-color:#ffcc00; --glow:rgba(255,200,0,0.7);}
-body.theme-me3 { --main-color:#00e5ff; --glow:rgba(0,200,255,0.7);}
-
-body {
-  margin:0;
-  font-family:"MEFont";
-  background:black;
-  overflow:hidden;
-  color:white;
-}
-
-.bg {
-  position:absolute;
-  width:120%;
-  height:120%;
-  background-size:cover;
-  background-position:center;
-  filter:brightness(0.6) blur(4px);
-  transform:translate(-10%,-10%);
-  transition:0.8s;
-}
-
-.bg.zoom {
-  transform:translate(-10%,-10%) scale(1.2);
-  filter:brightness(0.3) blur(8px);
-}
-
-.overlay {
-  position:absolute;
-  width:100%;
-  height:100%;
+.game-card:nth-child(2):hover .card-overlay {
   background:
-    radial-gradient(circle, var(--glow), transparent 60%),
-    linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.8));
+    linear-gradient(180deg, rgba(0,6,16,0.15) 0%, rgba(0,6,16,0) 30%, rgba(0,6,16,0.3) 60%, rgba(0,8,20,0.95) 100%),
+    linear-gradient(0deg, rgba(255,160,0,0.05) 0%, transparent 40%);
 }
 
-.wrapper {
-  position:relative;
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:space-between;
-  opacity:0;
-  transform:translateY(40px);
-  animation:fadeIn 1.2s ease forwards;
+.game-card:nth-child(2) .launch-btn:hover {
+  background: rgba(255,160,0,0.2);
+  border-color: rgba(255,160,0,0.6);
+  color: #ffb830;
+  box-shadow: 0 0 30px rgba(255,160,0,0.2), inset 0 0 30px rgba(255,160,0,0.05);
 }
 
-@keyframes fadeIn {
-  to { opacity:1; transform:translateY(0); }
+.game-card:nth-child(2) .launch-btn::before {
+  background: linear-gradient(90deg, transparent, rgba(255,160,0,0.1), transparent);
 }
 
-.header {
-  margin-top:60px;
-}
-.header img {
-  width:360px;
-  filter:brightness(0) invert(1);
+.game-card:nth-child(2):hover .card-glow-line {
+  background: linear-gradient(90deg, transparent, rgba(255,160,0,0.5), transparent);
 }
 
-.games {
-  display:flex;
-  gap:30px;
+.game-card:nth-child(3):hover::before {
+  border-color: rgba(255,50,50,0.5);
 }
 
-.card {
-  width:200px;
-  height:260px;
-  border-radius:18px;
-  overflow:hidden;
-  position:relative;
-
-  border:1px solid var(--main-color);
-  cursor:pointer;
-  transition:0.35s;
-
-  background:rgba(0,0,0,0.4);
+.game-card:nth-child(3):hover .card-name {
+  color: #ff4040;
 }
 
-.card::before {
-  content:"";
-  position:absolute;
-  width:100%;
-  height:100%;
-  background-size:cover;
-  background-position:center;
-  opacity:0.9;
-  transition:0.4s;
+.game-card:nth-child(3):hover .card-overlay {
+  background:
+    linear-gradient(180deg, rgba(0,6,16,0.15) 0%, rgba(0,6,16,0) 30%, rgba(0,6,16,0.3) 60%, rgba(0,8,20,0.95) 100%),
+    linear-gradient(0deg, rgba(255,50,50,0.05) 0%, transparent 40%);
 }
 
-.card:hover {
-  transform:scale(1.07);
-  box-shadow:0 0 25px var(--glow);
+.game-card:nth-child(3) .launch-btn:hover {
+  background: rgba(255,50,50,0.2);
+  border-color: rgba(255,50,50,0.6);
+  color: #ff6060;
+  box-shadow: 0 0 30px rgba(255,50,50,0.2), inset 0 0 30px rgba(255,50,50,0.05);
 }
 
-.card:hover::before {
-  transform:scale(1.05);
+.game-card:nth-child(3) .launch-btn::before {
+  background: linear-gradient(90deg, transparent, rgba(255,50,50,0.1), transparent);
 }
 
-.card.active {
-  box-shadow:0 0 40px var(--glow);
+.game-card:nth-child(3):hover .card-glow-line {
+  background: linear-gradient(90deg, transparent, rgba(255,50,50,0.5), transparent);
+}
+    .bottom-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 50px 28px 50px;
+      animation: fadeIn 0.6s ease 0.5s both;
+    }
+
+    .bottom-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .path-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.card.me1::before { background-image:url("./me1.jpg"); }
-.card.me2::before { background-image:url("./me2.jpg"); }
-.card.me3::before { background-image:url("./me3.jpg"); }
-
-.card span {
-  position:absolute;
-  bottom:10px;
-  width:100%;
-  text-align:center;
-  font-size:18px;
-  text-shadow:0 0 10px black;
+.path-label {
+  font-size: 8px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(0,160,255,0.35);
 }
 
-.playBtn {
-  margin-top:20px;
-  padding:10px 40px;
-  border:2px solid var(--main-color);
-  border-radius:10px;
-
-  background:rgba(0,0,0,0.5);
-  color:var(--main-color);
-
-  cursor:pointer;
-  transition:0.3s;
+.path-buttons {
+  display: flex;
+  gap: 20px;
 }
 
-.playBtn:hover {
-  background:var(--main-color);
-  color:black;
-  box-shadow:0 0 20px var(--glow);
+    .path-btn {
+      background: none;
+      border: 1px solid rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.25);
+      padding: 6px 14px;
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      -webkit-app-region: no-drag;
+      pointer-events: all;
+      position: relative;
+      z-index: 50;
+    }
+
+    .path-btn:hover {
+      border-color: rgba(0,160,255,0.3);
+      color: rgba(0,160,255,0.6);
+      background: rgba(0,160,255,0.05);
+    }
+
+    .path-btn:active {
+      background: rgba(0,160,255,0.1);
+      transform: scale(0.97);
+    }
+
+    .path-btn.set {
+      border-color: rgba(0,200,100,0.2);
+      color: rgba(0,200,100,0.5);
+    }
+
+    .path-btn.set:hover {
+      border-color: rgba(0,200,100,0.4);
+      color: rgba(0,200,100,0.7);
+      background: rgba(0,200,100,0.05);
+    }
+
+    .bottom-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .version-text {
+      font-size: 9px;
+      color: rgba(255,255,255,0.15);
+      letter-spacing: 3px;
+    }
+
+    .deco-line-h {
+      position: absolute;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,160,255,0.12), transparent);
+      pointer-events: none;
+    }
+
+    .deco-line-v {
+      position: absolute;
+      width: 1px;
+      background: linear-gradient(180deg, transparent, rgba(0,160,255,0.08), transparent);
+      pointer-events: none;
+    }
+
+    .deco-top {
+      top: 100px;
+      left: 50px;
+      right: 50px;
+    }
+
+    .deco-bottom {
+      bottom: 70px;
+      left: 50px;
+      right: 50px;
+    }
+
+    .deco-left {
+      left: 50px;
+      top: 100px;
+      bottom: 70px;
+    }
+
+    .deco-right {
+      right: 50px;
+      top: 100px;
+      bottom: 70px;
+    }
+
+    .corner {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      z-index: 50;
+      pointer-events: none;
+    }
+
+    .corner-tl {
+      top: 98px;
+      left: 48px;
+      border-top: 1px solid rgba(0,160,255,0.2);
+      border-left: 1px solid rgba(0,160,255,0.2);
+    }
+
+    .corner-tr {
+      top: 98px;
+      right: 48px;
+      border-top: 1px solid rgba(0,160,255,0.2);
+      border-right: 1px solid rgba(0,160,255,0.2);
+    }
+
+    .corner-bl {
+      bottom: 68px;
+      left: 48px;
+      border-bottom: 1px solid rgba(0,160,255,0.2);
+      border-left: 1px solid rgba(0,160,255,0.2);
+    }
+
+    .corner-br {
+      bottom: 68px;
+      right: 48px;
+      border-bottom: 1px solid rgba(0,160,255,0.2);
+      border-right: 1px solid rgba(0,160,255,0.2);
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .game-card:nth-child(1) {
+      animation: fadeInUp 0.8s ease 0.1s both;
+    }
+
+    .game-card:nth-child(2) {
+      animation: fadeInUp 0.8s ease 0.25s both;
+    }
+
+    .game-card:nth-child(3) {
+      animation: fadeInUp 0.8s ease 0.4s both;
+    }
+
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
+    .lang-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 6px;
+  background: rgba(4,8,20,0.97);
+  border: 1px solid rgba(0,160,255,0.2);
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  z-index: 500;
+  min-width: 160px;
+  display: none;
+  backdrop-filter: blur(10px);
 }
 
-.settings {
-  display:flex;
-  gap:20px;
-  margin-bottom:30px;
-}
+    .lang-dropdown.open {
+      display: block;
+      animation: fadeIn 0.2s ease both;
+    }
 
-.btn {
-  padding:8px 16px;
-  border:1px solid var(--main-color);
-  border-radius:8px;
+    .lang-option {
+      padding: 8px 18px;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
 
-  background:rgba(0,0,0,0.45);
-  color:var(--main-color);
+    .lang-option:hover {
+      background: rgba(0,160,255,0.1);
+      color: #00c8ff;
+    }
 
-  cursor:pointer;
-}
+    .lang-option.active {
+      color: #00c8ff;
+      background: rgba(0,160,255,0.06);
+    }
 
-.btn:hover {
-  background:var(--main-color);
-  color:black;
-  box-shadow:0 0 12px var(--glow);
-}
-
-.playground {
-  position:absolute;
-  bottom:15px;
-  left:15px;
-
-  width:36px;
-  height:36px;
-
-  border:1px solid var(--main-color);
-  border-radius:8px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  font-size:10px;
-  color:var(--main-color);
-
-  background:rgba(0,0,0,0.4);
-  cursor:pointer;
-  transition:0.25s;
-}
-
-.playground:hover {
-  background:var(--main-color);
-  color:black;
-  box-shadow:0 0 10px var(--glow);
-}
-
-.loading {
-  position:absolute;
-  width:100%;
-  height:100%;
-  background:black;
-  opacity:0;
-  transition:0.6s;
-}
-.loading.active { opacity:1; }
-
-</style>
-
+    .setting-btn-wrap {
+      position: relative;
+      -webkit-app-region: no-drag;
+      z-index: 500;
+    }
+  </style>
 </head>
+<body>
 
-<body class="theme-me1">
+<div class="bg-layer" id="bgLayer">
+  <img class="bg-image" src="bg.jpg" draggable="false">
+  <div class="bg-gradient"></div>
+</div>
 
-<div class="bg" id="bg"></div>
-<div class="overlay"></div>
+<div class="particles" id="particles"></div>
+<div class="scanline"></div>
 
-<div class="wrapper">
+<div class="deco-line-h deco-top"></div>
+<div class="deco-line-h deco-bottom"></div>
+<div class="deco-line-v deco-left"></div>
+<div class="deco-line-v deco-right"></div>
+<div class="corner corner-tl"></div>
+<div class="corner corner-tr"></div>
+<div class="corner corner-bl"></div>
+<div class="corner corner-br"></div>
 
-  <div class="header">
-    <img src="./logo.png">
+<div class="titlebar">
+  <div class="titlebar-buttons">
+    <button class="tb-btn" onclick="window.electronAPI.minimize()" title="Свернуть">─</button>
+    <button class="tb-btn close" onclick="window.close()" title="Закрыть">✕</button>
+  </div>
+</div>
+
+<div class="main-container">
+
+  <div class="top-bar">
+    <div class="logo-area">
+      <div class="logo-icon">
+        <svg viewBox="0 0 100 100" fill="none">
+          <polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" stroke="rgba(0,160,255,0.4)" stroke-width="1.5" fill="rgba(0,160,255,0.03)"/>
+          <polygon points="50,20 80,37 80,63 50,80 20,63 20,37" stroke="rgba(0,160,255,0.2)" stroke-width="1" fill="none"/>
+          <circle cx="50" cy="50" r="8" fill="rgba(0,160,255,0.3)"/>
+          <circle cx="50" cy="50" r="3" fill="rgba(0,200,255,0.8)"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <span class="sub">dev by k3nz0iq</span>
+      </div>
+    </div>
+    <div class="settings-area">
+      <div class="setting-btn-wrap">
+        <button class="setting-btn" id="langBtn" onclick="toggleLangDropdown()">
+          <span class="label">Language</span>
+          Russian
+        </button>
+        <div class="lang-dropdown" id="langDropdown"></div>
+      </div>
+      <div class="setting-btn-wrap">
+        <button class="setting-btn" id="voBtn" onclick="toggleVO()">
+          <span class="label">Voiceover</span>
+          VO OFF
+        </button>
+      </div>
+    </div>
   </div>
 
-  <div>
-    <div class="games">
-      <div class="card me1 active" onclick="selectGame(this,'ME1')">
-        <span>ME1</span>
+  <div class="content">
+    <div class="game-cards">
+
+      <div class="game-card" ondblclick="launch('ME1')">
+        <div class="card-bg">
+          <img src="me1.jpg" draggable="false">
+        </div>
+        <div class="card-overlay"></div>
+        <div class="card-content">
+          <div class="card-name">MASS EFFECT 1</div>
+          <div class="card-playtime">
+            <svg class="playtime-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15V7l6 5-6 5z"/>
+            </svg>
+            <span class="playtime-text" id="me1Time">0h 0m</span>
+          </div>
+          <button class="launch-btn" onclick="event.stopPropagation();launch('ME1')">Launch</button>
+        </div>
+        <div class="card-glow-line"></div>
       </div>
 
-  <div class="card me2" onclick="selectGame(this,'ME2')">
-    <span>ME2</span>
+      <div class="game-card" ondblclick="launch('ME2')">
+        <div class="card-bg">
+          <img src="me2.jpg" draggable="false">
+        </div>
+        <div class="card-overlay"></div>
+        <div class="card-content">
+          <div class="card-name">MASS EFFECT 2</div>
+          <div class="card-playtime">
+            <svg class="playtime-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15V7l6 5-6 5z"/>
+            </svg>
+            <span class="playtime-text" id="me2Time">0h 0m</span>
+          </div>
+          <button class="launch-btn" onclick="event.stopPropagation();launch('ME2')">Launch</button>
+        </div>
+        <div class="card-glow-line"></div>
+      </div>
+
+      <div class="game-card" ondblclick="launch('ME3')">
+        <div class="card-bg">
+          <img src="me3.jpg" draggable="false">
+        </div>
+        <div class="card-overlay"></div>
+        <div class="card-content">
+          <div class="card-name">MASS EFFECT 3</div>
+          <div class="card-playtime">
+            <svg class="playtime-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15V7l6 5-6 5z"/>
+            </svg>
+            <span class="playtime-text" id="me3Time">0h 0m</span>
+          </div>
+          <button class="launch-btn" onclick="event.stopPropagation();launch('ME3')">Launch</button>
+        </div>
+        <div class="card-glow-line"></div>
+      </div>
+
+    </div>
   </div>
 
-  <div class="card me3" onclick="selectGame(this,'ME3')">
-    <span>ME3</span>
-  </div>
-</div>
-
-<div style="text-align:center;">
-  <div class="playBtn" onclick="launch()">PLAY</div>
-</div>
-
-  </div>
-
-  <div class="settings">
-    <div class="btn" id="langBtn" onclick="toggleLang()">RUSSIAN</div>
-    <div class="btn" id="voBtn" onclick="toggleVO()">VO OFF</div>
-  </div>
-
-</div>
-
-<div class="playground" onclick="openPlayground()">PG</div>
-
-<div class="loading" id="loading"></div>
+  <div class="bottom-bar">
+    <div class="bottom-left">
+      <div class="path-section">
+        <div class="path-label">Select Game EXE</div>
+        <div class="path-buttons">
+          <button class="path-btn" id="pathME1" onclick="selectPath('ME1')">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px;opacity:0.5">
+              <path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/>
+            </svg>
+            ME1.exe
+          </button>
+          <button class="path-btn" id="pathME2" onclick="selectPath('ME2')">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px;opacity:0.5">
+              <path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/>
+            </svg>
+            ME2.exe
+          </button>
+          <button class="path-btn" id="pathME3" onclick="selectPath('ME3')">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px;opacity:0.5">
+              <path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/>
+            </svg>
+            ME3.exe
+          </button>
+        </div>
+      </div>
+    </div>
 
 <script>
-let backgrounds = {
-  ME1:"./bg1.jpg",
-  ME2:"./bg2.jpg",
-  ME3:"./bg3.jpg"
-};
+  let lang = "Russian";
+  let vo = 0;
+  let playtime = { ME1: 0, ME2: 0, ME3: 0 };
+  let langDropdownOpen = false;
+  const langs = ["English", "French", "German", "Spanish", "Italian", "Russian", "Polish", "Japanese"];
 
-let langs=["English","French","German","Spanish","Italian","Russian","Polish","Japanese"];
+  async function init() {
+    const settings = await window.electronAPI.getSettings();
+    lang = settings.lang || "Russian";
+    vo = settings.vo || 0;
+    playtime = settings.playtime || { ME1: 0, ME2: 0, ME3: 0 };
+    updateUI();
+    await updatePathButtons();
+    generateParticles();
+    initParallax();
+    buildLangDropdown();
+  }
 
-let selectedGame="ME1";
-let langIndex=5;
-let currentVO=false;
+  function launch(game) {
+    window.electronAPI.launchGame(game, lang, vo);
+    const cards = document.querySelectorAll('.game-card');
+    const idx = game === 'ME1' ? 0 : game === 'ME2' ? 1 : 2;
+    const btn = cards[idx].querySelector('.launch-btn');
+    btn.textContent = 'LAUNCHING...';
+    btn.style.color = '#00e0ff';
+    btn.style.borderColor = 'rgba(0,224,255,0.6)';
+    setTimeout(function() {
+      btn.textContent = 'LAUNCH';
+      btn.style.color = '';
+      btn.style.borderColor = '';
+    }, 3000);
+  }
 
-const bg=document.getElementById("bg");
+  function buildLangDropdown() {
+    const dropdown = document.getElementById('langDropdown');
+    dropdown.innerHTML = '';
+    langs.forEach(function(l) {
+      const div = document.createElement('div');
+      div.className = 'lang-option' + (l === lang ? ' active' : '');
+      div.textContent = l;
+      div.onclick = function(e) {
+        e.stopPropagation();
+        lang = l;
+        window.electronAPI.saveSettings(lang, vo);
+        updateUI();
+        closeLangDropdown();
+        buildLangDropdown();
+      };
+      dropdown.appendChild(div);
+    });
+  }
 
-async function init(){
-  const s=await window.electronAPI.getSettings();
-  langIndex=langs.indexOf(s.lang);
-  if(langIndex==-1) langIndex=5;
-  currentVO=s.vo;
+  function toggleLangDropdown() {
+    const dropdown = document.getElementById('langDropdown');
+    langDropdownOpen = !langDropdownOpen;
+    if (langDropdownOpen) {
+      dropdown.classList.add('open');
+    } else {
+      dropdown.classList.remove('open');
+    }
+  }
 
-  setTheme("ME1");
-  setBackground("ME1");
-  updateUI();
-}
+  function closeLangDropdown() {
+    langDropdownOpen = false;
+    document.getElementById('langDropdown').classList.remove('open');
+  }
 
-function setBackground(g){
-  bg.style.backgroundImage=`url(${backgrounds[g]})`;
-}
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.setting-btn-wrap')) {
+      closeLangDropdown();
+    }
+  });
 
-function setTheme(g){
-  document.body.className="";
-  document.body.classList.add("theme-"+g.toLowerCase());
-}
+  function toggleVO() {
+    vo = vo ? 0 : 1;
+    window.electronAPI.saveSettings(lang, vo);
+    updateUI();
+  }
 
-function selectGame(el,g){
-  document.querySelectorAll(".card").forEach(c=>c.classList.remove("active"));
-  el.classList.add("active");
+  function selectPath(game) {
+    window.electronAPI.selectGamePath(game).then(function() {
+      updatePathButtons();
+    });
+  }
 
-  selectedGame=g;
-  setTheme(g);
-  setBackground(g);
-}
+  function updatePathButtons() {
+    return window.electronAPI.getGamePaths().then(function(paths) {
+      ['ME1', 'ME2', 'ME3'].forEach(function(g) {
+        var btn = document.getElementById('path' + g);
+        if (paths[g]) {
+          btn.classList.add('set');
+          var parts = paths[g].replace(/\\/g, '/').split('/');
+          var fileName = parts[parts.length - 1];
+          btn.title = paths[g];
+          btn.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px;opacity:0.5"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>' + g + ' · ' + fileName;
+        } else {
+          btn.classList.remove('set');
+          btn.title = 'Нажмите чтобы выбрать exe';
+          btn.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px;opacity:0.5"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>' + g + '.exe';
+        }
+      });
+    });
+  }
 
-function launch(){
-  document.getElementById("loading").classList.add("active");
-  bg.classList.add("zoom");
+  function formatTime(sec) {
+    if (!sec) sec = 0;
+    var h = Math.floor(sec / 3600);
+    var m = Math.floor((sec % 3600) / 60);
+    return h + 'h ' + m + 'm';
+  }
 
-  setTimeout(()=>{
-    window.electronAPI.launchGame(
-      selectedGame,
-      langs[langIndex],
-      currentVO?1:0
-    );
-  },1200);
-}
+  function updateUI() {
+    document.getElementById("langBtn").innerHTML = '<span class="label">Language</span>' + lang;
+    document.getElementById("voBtn").innerHTML = '<span class="label">Voiceover</span>' + (vo ? "VO ON" : "VO OFF");
+    document.getElementById("me1Time").innerText = formatTime(playtime.ME1);
+    document.getElementById("me2Time").innerText = formatTime(playtime.ME2);
+    document.getElementById("me3Time").innerText = formatTime(playtime.ME3);
+  }
 
-function toggleLang(){
-  langIndex=(langIndex+1)%langs.length;
-  updateUI();
-}
+  function generateParticles() {
+    var container = document.getElementById('particles');
+    for (var i = 0; i < 20; i++) {
+      var p = document.createElement('div');
+      p.className = 'particle';
+      var size = Math.random() * 4 + 2;
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      p.style.left = Math.random() * 100 + '%';
+      p.style.bottom = '-10px';
+      p.style.animationDuration = (Math.random() * 15 + 10) + 's';
+      p.style.animationDelay = (Math.random() * 15) + 's';
+      container.appendChild(p);
+    }
+  }
 
-function toggleVO(){
-  currentVO=!currentVO;
-  updateUI();
-}
+  function initParallax() {
+    var bgLayer = document.getElementById('bgLayer');
+    document.addEventListener('mousemove', function(e) {
+      var x = (e.clientX / 1280 - 0.5) * 20;
+      var y = (e.clientY / 720 - 0.5) * 20;
+      bgLayer.style.transform = 'translate(' + (-x) + 'px, ' + (-y) + 'px)';
+    });
+  }
 
-function updateUI(){
-  document.getElementById("langBtn").innerText=langs[langIndex];
-  document.getElementById("voBtn").innerText=currentVO?"VO ON":"VO OFF";
-}
-
-function openPlayground(){
-  window.open("https://users.playground.ru/2492109/");
-}
-
-window.onload=init;
+  window.onload = init;
 </script>
 
 </body>
